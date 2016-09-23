@@ -17,12 +17,22 @@ import java.util.List;
  */
 public class EntityList implements Iterable<Entity> {
 
+   /********************* Class Constants *******************/
+
+   private static final int INITIAL_CAPACITY = 20;
+
+   /************************ Instance Variables *****************/
+
    private final List<Entity> entities;
+
+   /************************* Constructor ************************/
 
    public EntityList()
    {
-      entities = new ArrayList<>();
+      entities = new ArrayList<>(INITIAL_CAPACITY);
    }
+
+   /************************ Interface Methods *******************/
 
    public void add(final Entity entity)
    {

@@ -1,24 +1,31 @@
 package ac.bris.cs.platformer.theGame.movement;
 
 /**
- * Created by bw12954 on 01/06/16.
+ * Simple class to encapsulate information about a quantity applied in a
+ * particularly direction (given a set of x and y coordinates), used for
+ * things like velocity and acceleration
  */
-public class Direction {
+class Direction {
+
+   /************************ Instance Variable *******************/
 
    double x;
    double y;
+
+   /************************ Interface Methods *******************/
 
    double x() {
       return x;
    }
 
-   void set(double x, double y)
+
+   void set(final double x, final double y)
    {
       this.x = x;
       this.y = y;
    }
 
-   void increase(double x, double y)
+   void increase(final double x, final double y)
    {
       this.x += x;
       this.y += y;
@@ -53,7 +60,7 @@ public class Direction {
       } catch(CloneNotSupportedException e) {
          // It IS supported. Do nothing...
       }
-      Direction dir = new Direction();
+      final Direction dir = new Direction();
       dir.set(x, y);
       return dir;
    }

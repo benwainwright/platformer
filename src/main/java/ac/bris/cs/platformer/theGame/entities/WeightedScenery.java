@@ -3,12 +3,17 @@ package ac.bris.cs.platformer.theGame.entities;
 import java.io.IOException;
 
 /**
- * Created by bw12954 on 02/06/16.
+ * Subclass of Entity - scenery such as trees, that react to gravity, do
+ * not collide with the player, but do obscure him from view
  */
 public class WeightedScenery extends Entity {
 
+   /************************ Class Constants *******************/
+
    private static final int Z_POSITION = 1000;
    private static final int MASS       = 1;
+
+   /************************* Constructor ************************/
 
    public WeightedScenery(final int x,
                           final int y,
@@ -18,6 +23,8 @@ public class WeightedScenery extends Entity {
    {
       super(x, y, Z_POSITION, scale, imageFile);
    }
+
+   /************************ Interface Methods *******************/
 
    @Override
    public int getMass()
@@ -34,12 +41,12 @@ public class WeightedScenery extends Entity {
    @Override
    public void onSpriteUpdate()
    {
-
+      // Required by superclass
    }
 
    @Override
    public void onTick()
    {
-
+      // Required by superclass
    }
 }

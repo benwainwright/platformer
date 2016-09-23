@@ -11,11 +11,15 @@ import java.io.IOException;
  */
 public class SpriteSheet {
 
+   /************************ Instance Variables *******************/
+
    private final BufferedImage[] sprites;
    private final int             rows;
    private final int             cols;
    private final int             width;
    private final int             height;
+
+   /************************* Constructor ************************/
 
    public SpriteSheet(final String fileName,
                       final int rows,  final int cols,
@@ -30,22 +34,7 @@ public class SpriteSheet {
       sprites      = loadSprites(image);
    }
 
-   @SuppressWarnings("MethodWithMultipleLoops")
-   private BufferedImage[] loadSprites(final BufferedImage image)
-   {
-      final BufferedImage[] sprites      = new BufferedImage[rows * cols];
-      final int             spriteWidth  = width / cols;
-      final int             spriteHeight = height / rows;
-      for(int i = 0; i < rows; i++) {
-         for(int ii = 0; ii < cols; ii++) {
-            sprites[(i * cols) + ii] = image.getSubimage(ii * spriteWidth,
-                                                         i * spriteHeight,
-                                                         spriteWidth,
-                                                         spriteHeight);
-         }
-      }
-      return sprites;
-   }
+   /************************ Interface Methods *******************/
 
    public BufferedImage get(final int i)
    {
@@ -56,4 +45,23 @@ public class SpriteSheet {
    {
       return sprites[0];
    }
+
+   /************************* Initialisation  *******************/
+
+   private BufferedImage[] loadSprites(final BufferedImage image)
+   {
+      final BufferedImage[] temp         = new BufferedImage[rows * cols];
+      final int             spriteWidth  = width / cols;
+      final int             spriteHeight = height / rows;
+      for(int i = 0; i < rows; i++) {
+         for(int ii = 0; ii < cols; ii++) {
+            temp[(i * cols) + ii] = image.getSubimage(ii * spriteWidth,
+                                                      i * spriteHeight,
+                                                      spriteWidth,
+                                                      spriteHeight);
+         }
+      }
+      return temp;
+   }
+
 }

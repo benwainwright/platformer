@@ -2,37 +2,40 @@ package ac.bris.cs.platformer.theGame.entities;
 
 import ac.bris.cs.platformer.SoundPlayer;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by bw12954 on 01/06/16.
+ * Collectible gems. These behave mostly like any other entity, accept
+ * when the player collides with them, they disappear and increase his
+ * score
  */
-@SuppressWarnings("StringConcatenationMissingWhitespace")
 public class Gem extends Entity {
+
+   /************************ Class Constants *******************/
 
    private static final String      IMAGE_FILE = "triangleGem.png";
    private static final int         Z_POSITION = 500;
    private static final int         MASS       = 1;
+
    private        final SoundPlayer ding;
 
-   public Gem(final int    x,
-              final int    y,
-              final double scale,
-              final String imageFile)
-   throws IOException
-   {
-      super(x, y, Z_POSITION, scale, imageFile);
-      ding = new SoundPlayer("audio" + File.separator + "ding.wav");
-   }
+   /************************* Constructor ************************/
 
-   public Gem(final int    x,
-              final int    y,
-              final double scale)
+   public Gem(final int x, final int y, final double scale)
    throws IOException
    {
       this(x, y, scale, IMAGE_FILE);
    }
+
+   private Gem(final int  x, final int y, final double scale,
+               final String imageFile)
+   throws IOException
+   {
+      super(x, y, Z_POSITION, scale, imageFile);
+      ding = new SoundPlayer("audio/ding.wav");
+   }
+
+   /************************ Interface Methods *******************/
 
    @Override
    public int getMass()
@@ -41,7 +44,6 @@ public class Gem extends Entity {
    }
 
    @Override
-   @SuppressWarnings("CastToConcreteClass")
    public boolean onCollision(final Entity withWhat)
    {
       if(withWhat instanceof Player) {
@@ -55,11 +57,12 @@ public class Gem extends Entity {
    @Override
    public void onSpriteUpdate()
    {
-
+      // Required by superclass
    }
 
    @Override
    public void onTick()
    {
+      // Required by superclass
    }
 }

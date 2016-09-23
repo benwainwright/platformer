@@ -2,7 +2,6 @@ package ac.bris.cs.platformer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -22,10 +21,15 @@ public final class Utils {
    public static BufferedImage loadImage(final String fileName)
    throws IOException
    {
-      final String newFileName = GRAPHICS_LOCATION +
-                                 File.separator    +
-                                 fileName;
-      return ImageIO.read(getResourceUrl(newFileName));
+      final String newFileName = GRAPHICS_LOCATION + "/" + fileName;
+      try {
+         return ImageIO.read(getResourceUrl(newFileName));
+      } catch(final IllegalArgumentException e) {
+         System.out.println("Failed while trying to load '" +
+                            newFileName + "'");
+         e.printStackTrace();
+         throw e;
+      }
    }
 
    public static int downScaleInt(final int num, final double fact)

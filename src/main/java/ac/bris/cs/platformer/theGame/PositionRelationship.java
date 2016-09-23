@@ -6,11 +6,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static ac.bris.cs.platformer.theGame.PositionRelationship.Side.*;
-import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.*;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Side.BOTTOM;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Side.LEFT;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Side.RIGHT;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Side.TOP;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.CONTAINED;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.CONTAINER;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.EDGE;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.IDENTICAL;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.OVERLAP;
+import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.SEPARATE;
 
 /**
- * Classifies the relationship between two entities in terms of position
+ * Factory class that produces objects classifying the * relationshiop
+ * between two entities in terms of position
  *
  * Note that entity origins are considered to be at the BOTTOM left,
  * not top left. This is because when the background is scaled down.
@@ -33,6 +42,8 @@ import static ac.bris.cs.platformer.theGame.PositionRelationship.Type.*;
 
 public final class PositionRelationship {
 
+   /************************ Instance Variables *******************/
+
    public final List<Side> sides;
    public final Type       type;
 
@@ -52,6 +63,8 @@ public final class PositionRelationship {
       SEPARATE
    }
 
+   /************************* Constructor ************************/
+
    private PositionRelationship(final Side[] sides,
                                 final Type type)
    {
@@ -59,11 +72,12 @@ public final class PositionRelationship {
       this.sides = Collections.unmodifiableList(Arrays.asList(sides));
    }
 
-   @SuppressWarnings("FeatureEnvy")
+   /************************ Factory Methods *******************/
+
    public static PositionRelationship compare(final Entity one,
                                               final Entity two)
    {
-      if(one == two) {
+      if(one.equals(two)) {
          return new PositionRelationship(new Side[] { }, IDENTICAL);
       } else {
          final int l1 = one.left();
@@ -78,7 +92,6 @@ public final class PositionRelationship {
       }
    }
 
-   @SuppressWarnings("NestedAssignment")
    public static PositionRelationship compare(final int l1, final int r1,
                                               final int t1, final int b1,
                                               final int l2, final int r2,
@@ -103,6 +116,8 @@ public final class PositionRelationship {
       return new PositionRelationship(new Side[] { }, SEPARATE);
    }
 
+   /*************************** Private Methods *******************/
+
    private static PositionRelationship checkForEdges(final int l1, final int r1,
                                                      final int t1, final int b1,
                                                      final int l2, final int r2,
@@ -122,6 +137,7 @@ public final class PositionRelationship {
       }
       return new PositionRelationship(side, EDGE);
    }
+
 
    private static PositionRelationship checkForOverlaps(final int l1, final int r1,
                                                         final int t1, final int b1,

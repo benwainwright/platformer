@@ -10,12 +10,19 @@ import java.io.IOException;
 import static ac.bris.cs.platformer.theGame.movement.Velocity.Moving.STILL;
 
 /**
- * Maintains the identity of the player entity
+ * The Player class (the important one)
+ *
+ * As well as maintaining the player's position and appearance as with
+ * all the Entity sub-classes, the Player class keeps track of the
+ * score, and provides an interface which can be used to modify the
+ * score move him around
  */
 
 public class Player extends Entity {
 
-   private static final String fileName   = "mario.png";
+   /********************* Class Constants *******************/
+
+   private static final String FILE_NAME  = "mario.png";
    private static final int    ROWS       = 4;
    private static final int    COLS       = 12;
    private static final int    WIDTH      = 338;
@@ -23,53 +30,59 @@ public class Player extends Entity {
    private static final int    MASS       = 1;
    private static final double MOVE_FORCE = 3;
    private static final double JUMP_FORCE = 10;
-   private final  SoundPlayer jump;
+
+   /************************ Instance Variables *****************/
+
+   private final SoundPlayer jump;
    private       int         score;
 
-   public Player(int x, int y)
+   /************************* Constructor ************************/
+
+   public Player(final int x, final int y)
    throws IOException
    {
       super(x, y, WIDTH / COLS, HEIGHT / ROWS,
-            new SpriteSheet(fileName, ROWS, COLS,
-                            WIDTH, HEIGHT));
+            new SpriteSheet(FILE_NAME, ROWS, COLS, WIDTH, HEIGHT));
       leftSeq  = new SpriteSequence(new int[] { 18, 19, 20 });
       rightSeq = new SpriteSequence(new int[] { 31, 32, 33 });
-      jump     = new SoundPlayer("audio/jump.wav");
+      jump = new SoundPlayer("audio/jump.wav");
    }
+
+   /************************ Interface Methods *******************/
 
    public void move(final Moving direction)
    {
       moveActive = true;
       final SpriteSequence seq;
       final Double         force;
-      switch(direction) {
+      switch (direction) {
          case LEFT:
             force = -MOVE_FORCE;
-            seq   = leftSeq;
+            seq = leftSeq;
             break;
          case RIGHT:
             force = MOVE_FORCE;
-            seq   = rightSeq;
+            seq = rightSeq;
             break;
          default:
             force = 0.0;
-            seq   = null;
+            seq = null;
       }
       applyForce(force, 0.0);
       updateSpriteIfReady(seq);
    }
 
-   public void finishedMove()
-   {
-      moveActive = false;
-   }
-
    public void jump()
    {
-      if(getLanded()) {
+      if (hasLanded()) {
          applyForce(0.0, JUMP_FORCE);
          jump.play();
       }
+   }
+
+   public void finishedMove()
+   {
+      moveActive = false;
    }
 
    void increaseScore()
@@ -102,7 +115,7 @@ public class Player extends Entity {
    @Override
    public void onSpriteUpdate()
    {
-      if(landed && (trajectory.moveDirection() != STILL)) {
+      if (landed && (trajectory.moveDirection() != STILL)) {
          momentumMovementAnimation();
       }
    }
@@ -110,6 +123,6 @@ public class Player extends Entity {
    @Override
    public void onTick()
    {
-
+      // Required by superclass
    }
 }

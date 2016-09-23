@@ -1,9 +1,15 @@
 package ac.bris.cs.platformer.theGame.movement;
 
 /**
- * Created by bw12954 on 01/06/16.
+ * Encapsulation of velocity - responsible for recalculating at each
+ * step based on acceleration and also handles horizontal drag
  */
 public class Velocity extends Direction {
+
+   /************************ Class Constants *******************/
+
+   private static final int MAX_SPEED         = 5;
+   private static final int TERMINAL_VELOCITY = 10;
 
    public enum Moving {
       RIGHT,
@@ -11,24 +17,25 @@ public class Velocity extends Direction {
       STILL
    }
 
-   private static final int MAX_SPEED         = 5;
-   private static final int TERMINAL_VELOCITY = 10;
+   /************************ Instance Variable *******************/
 
    private double drag;
+
+   /************************ Interface Methods *******************/
 
    void setDrag(final double drag)
    {
       this.drag = drag;
    }
 
-   void recalculate(final Direction prevAccel,
-                           final Direction accel)
+   void recalculate(final Direction previousAcceleration,
+                    final Direction acceleration)
    {
       if((x < MAX_SPEED) && (x > -MAX_SPEED)) {
-         x += (accel.x() + prevAccel.x()) / 2.0;
+         x += (acceleration.x() + previousAcceleration.x()) / 2.0;
       }
       if(y > -TERMINAL_VELOCITY) {
-         y += (accel.y() + prevAccel.y()) / 2.0;
+         y += (acceleration.y() + previousAcceleration.y()) / 2.0;
       }
    }
    

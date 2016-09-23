@@ -7,8 +7,6 @@ import ac.bris.cs.platformer.theGame.entities.Entity;
 import ac.bris.cs.platformer.theGame.entities.EntityList;
 import ac.bris.cs.platformer.theGame.entities.Player;
 import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
-import org.imgscalr.Scalr.Mode;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -25,6 +23,8 @@ import java.io.IOException;
 import static ac.bris.cs.platformer.theGame.GameEngine.RenderType.ACTIVE;
 import static ac.bris.cs.platformer.theGame.GameEngine.RenderType.PASSIVE;
 import static java.awt.Font.PLAIN;
+import static org.imgscalr.Scalr.Method.QUALITY;
+import static org.imgscalr.Scalr.Mode.FIT_TO_WIDTH;
 
 /**
  * Superclass for game levels that sets up the game environment,
@@ -44,7 +44,7 @@ public abstract class World extends JPanel {
 
    /******************* Instance Variables *******************/
 
-   private final      Window        parent;
+   protected final    Window        parent;
    protected volatile Player        player;
    private            BufferedImage background;
    private            int           backgroundYPosAdjust;
@@ -139,16 +139,14 @@ public abstract class World extends JPanel {
       final Dimension size     = getPreferredSize();
       final double    oldWidth = background.getWidth();
       final int       winWidth = (int) size.getWidth();
-      background               = Scalr.resize(background,
-                                              Method.QUALITY,
-                                              Mode.FIT_TO_WIDTH,
-                                              winWidth);
-      final double newWidth = background.getWidth();
-      scaleFactor           = oldWidth / newWidth;
-      final int difference  = (int) (background.getHeight(null) -
-                                     size.getHeight());
-      if (difference > 0) {
-         backgroundYPosAdjust = difference;
+      background               = Scalr.resize(background, QUALITY,
+                                              FIT_TO_WIDTH, winWidth);
+      final double    newWidth = background.getWidth();
+      scaleFactor              = oldWidth / newWidth;
+      final int adjust         = (int) (background.getHeight(null) -
+                                        size.getHeight());
+      if (adjust > 0) {
+         backgroundYPosAdjust = adjust;
       }
    }
 

@@ -1,17 +1,24 @@
 package ac.bris.cs.platformer.theGame;
 
 /**
- * Created by bw12954 on 30/05/2016.
+ * Simple class allowing the index sequences of specific spritesheet
+ * animations to be stored in order to besed in loops
  */
 public class SpriteSequence {
 
+   /************************ Instance Variables *******************/
+
    private final int[] sequence;
    private int         position;
+
+   /************************* Constructor ************************/
 
    public SpriteSequence(final int[] sequence)
    {
       this.sequence = sequence.clone();
    }
+
+   /************************** Interface *************************/
 
    public int nextIndex()
    {

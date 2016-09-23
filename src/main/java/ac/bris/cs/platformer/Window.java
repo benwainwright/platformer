@@ -49,7 +49,7 @@ public class Window {
 
    /************************* Constructor ************************/
 
-   public Window()
+   Window()
    {
       SwingUtilities.invokeLater(this::run);
    }

@@ -8,7 +8,7 @@ import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by bw12954 on 02/06/16.
+ * Action object bound to the right arrow key
  */
 public class MoveRight extends AbstractAction {
 

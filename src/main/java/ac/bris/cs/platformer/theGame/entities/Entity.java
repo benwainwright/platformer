@@ -7,9 +7,9 @@ import ac.bris.cs.platformer.theGame.SpriteSequence;
 import ac.bris.cs.platformer.theGame.SpriteSheet;
 import ac.bris.cs.platformer.theGame.movement.Move;
 import ac.bris.cs.platformer.theGame.movement.Trajectory;
-import ac.bris.cs.platformer.theGame.movement.Velocity;
 import ac.bris.cs.platformer.theGame.movement.Velocity.Moving;
 import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -21,166 +21,119 @@ import java.util.Objects;
 import static ac.bris.cs.platformer.Utils.downScaleInt;
 import static ac.bris.cs.platformer.theGame.PositionRelationship.Side;
 import static ac.bris.cs.platformer.theGame.PositionRelationship.compare;
+import static ac.bris.cs.platformer.theGame.movement.Velocity.Moving.LEFT;
+import static ac.bris.cs.platformer.theGame.movement.Velocity.Moving.RIGHT;
 
 /**
- * This is the base class for all game entities
+ * Base class for all game entities. Initialises and keeps track of
+ * entity dimensions and trajectory, as well as containing a number of
+ * functions which are called by the game loop in order to update state
+ * and draw.
+ *
+ * As well as this, Entity stipulates some abstract methods that
+ * subclasses must implement, as they are called during the game loop at
+ * several points. This allows me to specify specific logic to be
+ * executed by a specific type of entity at particular points.
+ *
+ * This class implements comparable, in order that entities can be
+ * sorted by Z Position, allowing entities with a higher Z position to
+ * be drawn on top of lower Z position entities
  */
 public abstract class Entity implements Comparable<Entity> {
 
-   /****
-    * Private attributes
-    ****/
-
-   private final SpriteSheet sprites;
-   private final Dimension   dimensions;
-   private       boolean     readyForSpriteUpdate;
-
-   /*****
-    * Package local attributes
-    ****/
-
-   boolean moveActive;
-
-   /*****
-    * Protected attributes
-    *****/
-
-   protected       int            sprite;
-   protected       boolean        landed;
-   protected       BufferedImage  image;
-   protected final Trajectory     trajectory;
-   protected final Point          location;
-   protected       int            zPosition;
-   protected       SpriteSequence leftSeq;
-   protected       SpriteSequence rightSeq;
-   protected boolean alive = true;
-
-   /*****
-    * Constants
-    *****/
+   /********************* Class Constants *******************/
 
    private static final int EQUAL     = 0;
    private static final int LESS_THAN = -1;
    private static final int MORE_THAN = 1;
 
-   /****
-    * Constructors
-    ****/
+   /************************ Instance Variables *****************/
 
-   public Entity(int x, int y, int w, int h, SpriteSheet sprites)
+   private final SpriteSheet   sprites;
+   private final Dimension     dimensions;
+   private       boolean       readyForSpriteUpdate;
+   private       int           zPosition;
+   private       int           spriteNum;
+   private       BufferedImage image;
+   private final Point         location;
+
+   final Trajectory    trajectory;
+   SpriteSequence      leftSeq;
+   SpriteSequence      rightSeq;
+   boolean             landed;
+   boolean             moveActive;
+   boolean             alive = true;
+
+   /************************* Constructors ************************/
+
+   protected Entity(final int x, final int y, final int w, final int h,
+                    final SpriteSheet sprites)
    {
-      location = new Point(x, y);
-      dimensions = new Dimension(w, h);
-      trajectory = new Trajectory(this);
+      location     = new Point(x, y);
+      dimensions   = new Dimension(w, h);
+      trajectory   = new Trajectory(this);
       this.sprites = sprites;
    }
 
-   public Entity(int x, int y, int w,
-                 int h, int zPosition, SpriteSheet sprites)
+   protected Entity(final int x, final int y, final int w, final int h,
+                    final int zPosition, final SpriteSheet sprites)
    {
       this(x, y, w, h, sprites);
       this.zPosition = zPosition;
    }
 
-   public Entity(int x, int y, int w, int h)
+   protected Entity(final int x, final int y, final int w, final int h)
    {
       this(x, y, w, h, (SpriteSheet) null);
    }
 
-   public Entity(int x, int y, int w, int h, int zPosition)
+   protected Entity(final int x, final int y, final int w,
+                    final int h, final int zPosition)
    {
       this(x, y, w, h, zPosition, null);
    }
 
-   public Entity(int x, int y, BufferedImage image)
+   protected Entity(final int x, final int y, final BufferedImage image)
    {
       this(x, y, 0, image);
    }
 
-   public Entity(int x, int y, double scale, String imageFile)
+   protected Entity(final int x, final int y, final double scale,
+                    final String imageFile)
    throws IOException
    {
       this(x, y, 0, scale, imageFile);
    }
 
-   public Entity(int x, int y, int zPosition, double scale, String
-      imageFile)
+   protected Entity(final int x, final int y, final int zPosition,
+                    final double scale, final String imageFile)
    throws IOException
    {
       this(downScaleInt(x, scale), downScaleInt(y, scale), zPosition,
            loadAndScaleImage(imageFile, scale));
    }
 
-   public Entity(int x, int y, int zPosition, BufferedImage image)
+   protected Entity(final int x, final int y, final int zPosition,
+                    final BufferedImage image)
    {
       this(x, y, image.getWidth(), image.getHeight(), zPosition, null);
       this.image = image;
    }
 
-   public static BufferedImage loadAndScaleImage(final String fileName,
-                                                 final double scale)
-   throws IOException
-   {
-      final BufferedImage image     = Utils.loadImage(fileName);
-      final double        newWidth  = image.getWidth() / scale;
-      final double        newHeight = image.getHeight() / scale;
-      return Scalr.resize(image, Scalr.Method.QUALITY,
-                          (int)newWidth, (int)newHeight);
-   }
 
-   public Move getMove()
-   {
-      return trajectory.getMove();
-   }
 
-   public void doMove(int x, int y)
-   {
-      location.move(x, y);
-   }
+   /************************ Interface Methods *******************/
 
-   public void checkIfIveLanded(final EntityList entities)
-   {
-      boolean landed = false;
-      for (final Entity other : entities) {
-         if (other != this) {
-            PositionRelationship pr = compare(other, this);
-            if ((pr.type == Type.EDGE) && pr.sides.contains(Side.TOP)) {
-               landed = true;
-            }
-         }
-      }
-      this.landed = landed;
-   }
-
-   void applyForce(final double x,
-                   final double y)
-   {
-      trajectory.applyForce(x, y);
-   }
-
-   private Moving moveDirection()
-   {
-      return trajectory.moveDirection();
-   }
-
-   void moveY(final int y)
-   {
-      final int x = (int) location.getX();
-      doMove(x, y);
-   }
-
-   public void updateState(final EntityList entities,
-                           final double friction,
-                           final double gravity,
-                           final Dimension screenSize)
+   public void updateState(final EntityList entities, final double friction,
+                           final double gravity, final Dimension screenSize)
    {
       onTick();
       checkIfIveLanded(entities);
       if (landed) {
-         setDrag(friction);
+         trajectory.drag(friction);
       } else {
          applyForce(0.0, -gravity);
-         setDrag(0.0);
+         trajectory.drag(0.0);
       }
       if (isOffScreen(screenSize)) {
          alive = false;
@@ -190,21 +143,134 @@ public abstract class Entity implements Comparable<Entity> {
       }
    }
 
-   private boolean isOffScreen(Dimension screenSize)
+   public void paintMe(final Graphics g, final int screenHeight)
    {
-      if (location.getX() < 0 ||
-          location.getX() > screenSize.getWidth() ||
-          location.getY() < 0 ||
-          location.getY() > screenSize.getHeight()) {
-         return true;
-      } else {
-         return false;
+      final int           x        = (int)location.getX();
+      final int           y        = (int)location.getY();
+      final int           height   = (int)dimensions.getHeight();
+      final int           reversed = screenHeight - y - height;
+      final BufferedImage draw;
+      draw = (sprites != null)? sprites.get(spriteNum) : image;
+      g.drawImage(draw, x, reversed, null);
+   }
+
+   public void doMove(final int x, final int y)
+   {
+      location.move(x, y);
+   }
+
+   void applyForce(final double x, final double y)
+   {
+      trajectory.applyForce(x, y);
+   }
+
+   void moveY(final int y)
+   {
+      final int x = (int) location.getX();
+      doMove(x, y);
+   }
+
+   void updateSpriteIfReady(final SpriteSequence sequence)
+   {
+      if (readyForSpriteUpdate && (sprites != null) && (sequence != null)) {
+         spriteNum = sequence.nextIndex();
+         readyForSpriteUpdate = false;
       }
+   }
+
+   void momentumMovementAnimation()
+   {
+      if (!moveActive) {
+         if (moveDirection() == LEFT) {
+            updateSpriteIfReady(leftSeq);
+         } else if (moveDirection() == RIGHT) {
+            updateSpriteIfReady(rightSeq);
+         }
+      }
+   }
+
+   public void onAnimationTick()
+   {
+      if (readyForSpriteUpdate) {
+         onSpriteUpdate();
+      }
+   }
+
+   @Override
+   public int compareTo(final Entity entity)
+   {
+      if (zPosition == entity.zPosition) {
+         return EQUAL;
+      } else if (zPosition > entity.zPosition) {
+         return MORE_THAN;
+      } else {
+         return LESS_THAN;
+      }
+   }
+
+   public int left()
+   {
+      return (int)location.getX();
+   }
+
+   public int right()
+   {
+      return (int)((location.getX() + dimensions.getWidth()) - 1);
+   }
+
+   public int top()
+   {
+      return (int)((location.getY() + dimensions.getHeight()) - 1);
+   }
+
+   public int bottom()
+   {
+      return (int)location.getY();
+   }
+   boolean hasLanded()
+   {
+      return landed;
+   }
+
+   public void setReadyForSpriteUpdate()
+   {
+      readyForSpriteUpdate = true;
+   }
+
+   public Dimension getDimensions()
+   {
+      return dimensions;
+   }
+
+   public boolean isAlive()
+   {
+      return alive;
+   }
+
+   Trajectory getTrajectory()
+   {
+      return trajectory;
+   }
+
+   /*************** Collision Detection and Movement*******************/
+
+   private void checkIfIveLanded(final EntityList entities)
+   {
+      boolean hasLanded = false;
+      for (final Entity other : entities) {
+         if (!Objects.equals(other, this)) {
+            final PositionRelationship pr = compare(other, this);
+            if ((pr.type == Type.EDGE) && pr.sides.contains(Side.TOP)) {
+               hasLanded = true;
+            }
+         }
+      }
+      landed = hasLanded;
    }
 
    private void doMoveIfValid(final EntityList entities)
    {
-      final Move move = getMove();
+      final Move move = trajectory.getMove();
       if (move != null) {
          boolean doMove = true;
          for (final Entity checking : entities) {
@@ -220,129 +286,31 @@ public abstract class Entity implements Comparable<Entity> {
       }
    }
 
-   /*****
-    * Rendering
-    *****/
-
-   public void paintMe(Graphics g, int height)
+   private Moving moveDirection()
    {
-      int           reversedHeight =
-         height - (int) location.getY() - (int) dimensions.getHeight();
-      BufferedImage image          =
-         this.image == null? sprites.get(sprite) : this.image;
-      g.drawImage(image, (int) location.getX(), reversedHeight, null);
+      return trajectory.moveDirection();
    }
 
-   void updateSpriteIfReady(SpriteSequence sequence)
+   private boolean isOffScreen(final Dimension screenSize)
    {
-      if (readyForSpriteUpdate &&
-          sprites != null &&
-          sequence != null) {
-         sprite = sequence.nextIndex();
-         readyForSpriteUpdate = false;
-      }
+      return (location.getX() < 0)                     ||
+             (location.getX() > screenSize.getWidth()) ||
+             (location.getY() < 0)                     ||
+             (location.getY() > screenSize.getHeight());
    }
 
-   void momentumMovementAnimation()
+   private static BufferedImage loadAndScaleImage(final String fileName,
+                                                 final double scale)
+   throws IOException
    {
-      if (!moveActive) {
-         if (moveDirection() == Velocity.Moving.LEFT) {
-            updateSpriteIfReady(leftSeq);
-         } else if (moveDirection() == Velocity.Moving.RIGHT) {
-            updateSpriteIfReady(rightSeq);
-         }
-      }
+      final BufferedImage image     = Utils.loadImage(fileName);
+      final double        newWidth  = image.getWidth() / scale;
+      final double        newHeight = image.getHeight() / scale;
+      return Scalr.resize(image, Method.QUALITY, (int)newWidth,
+                                                 (int)newHeight);
    }
 
-   public void onAnimationTick()
-   {
-      if (readyForSpriteUpdate) {
-         onSpriteUpdate();
-      }
-   }
-
-   /****
-    * Dimensions
-    ****/
-
-   public int left()
-   {
-      return (int) location.getX();
-   }
-
-   public int right()
-   {
-      return (int) (location.getX() + dimensions.getWidth() - 1);
-   }
-
-   public int top()
-   {
-      return (int) (location.getY() + dimensions.getHeight() - 1);
-   }
-
-   public int bottom()
-   {
-      return (int) location.getY();
-   }
-
-
-   /****
-    * Overrides
-    ****/
-
-   @Override
-   public int compareTo(Entity entity)
-   {
-      if (zPosition == entity.getZposition()) {
-         return EQUAL;
-      } else if (zPosition > entity.getZposition()) {
-         return MORE_THAN;
-      } else {
-         return LESS_THAN;
-      }
-   }
-
-   /****
-    * Setters and getters
-    *****/
-
-   public void setDrag(double drag)
-   {
-      trajectory.drag(drag);
-   }
-
-   public boolean getLanded()
-   {
-      return landed;
-   }
-
-   public void setReadyForSpriteUpdate()
-   {
-      readyForSpriteUpdate = true;
-   }
-
-   public Dimension getDimensions()
-   {
-      return dimensions;
-   }
-
-   private int getZposition()
-   {
-      return zPosition;
-   }
-
-
-   public boolean isAlive()
-   {
-      return alive;
-   }
-
-   public void setAlive(boolean alive)
-   {
-      this.alive = alive;
-   }
-
-   /***** Abstract methods *****/
+   /************************ Abstract methods **********************/
 
    public abstract void onTick();
 

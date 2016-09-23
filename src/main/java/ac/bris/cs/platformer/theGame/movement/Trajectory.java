@@ -4,9 +4,8 @@ import ac.bris.cs.platformer.theGame.entities.Entity;
 import ac.bris.cs.platformer.theGame.movement.Velocity.Moving;
 
 /**
- * This class calculates the velocity of a moving object.
- * Note: Since I am not a physicist, I did not work out the gravity
- * algorithm myself.
+ * This class encapsulates the dynamic system for each class, keeping
+ * track of velocity and acceleration at each game step
  *
  * The classes in this package folder are my implementation of an algorithm
  * explained on the following page, with stuff like horizontal drag added by me
@@ -15,10 +14,14 @@ import ac.bris.cs.platformer.theGame.movement.Velocity.Moving;
  */
 public class Trajectory {
 
+   /************************ Instance Variable *******************/
+
    private final Entity    what;
    private final Direction acceleration;
    private final Velocity  velocity;
    private final Direction force;
+
+   /************************** Constructor **********************/
 
    public Trajectory(final Entity what)
    {
@@ -27,6 +30,8 @@ public class Trajectory {
       force        = new Direction();
       this.what    = what;
    }
+
+   /************************ Interface Methods *******************/
 
    public void applyForce(final double x,
                           final double y)
@@ -60,6 +65,7 @@ public class Trajectory {
          return move;
       }
    }
+   /************************ Step Calculations *******************/
 
    private Move doMove(final Direction lastAcceleration)
    {
@@ -72,8 +78,8 @@ public class Trajectory {
 
    private void calculateNewAcceleration()
    {
-      double x = force.x() / what.getMass();
-      double y = force.y() / what.getMass();
+      final double x = force.x() / what.getMass();
+      final double y = force.y() / what.getMass();
       acceleration.set(x, y);
    }
 

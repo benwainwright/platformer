@@ -11,23 +11,27 @@ import java.awt.Dimension;
  */
 public class Move {
 
+   /************************ Instance Variable *******************/
+
    private final Entity what;
    private final int    newLeft;
    private final int    newTop;
    private final int    newRight;
    private final int    newBottom;
 
-   public Move(final Entity what,
-               final int    x,
-               final int    y)
+   /*************************** Constructor **********************/
+
+   public Move(final Entity what, final int x, final int y)
    {
       final Dimension dims = what.getDimensions();
-      this.what      = what;
-      newLeft   = x;
-      newRight  = (x + (int)dims.getWidth()) - 1;
-      newBottom = y;
-      newTop    = (y + (int)dims.getHeight()) - 1;
+      this.what            = what;
+      newLeft              = x;
+      newRight             = (x + (int)dims.getWidth()) - 1;
+      newBottom            = y;
+      newTop               = (y + (int)dims.getHeight()) - 1;
    }
+
+   /************************ Interface Methods**********************/
 
    public boolean doesCollide(final Entity check)
    {
@@ -38,10 +42,8 @@ public class Move {
                                                              newLeft, newRight,
                                                              newTop, newBottom);
       switch(pr.type) {
-         case OVERLAP:
-         case IDENTICAL:
-         case CONTAINER:
-         case CONTAINED:
+         case OVERLAP: case IDENTICAL:
+         case CONTAINER: case CONTAINED:
             return true;
          default:
             return false;

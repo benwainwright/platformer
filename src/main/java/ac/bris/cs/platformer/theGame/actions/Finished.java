@@ -7,19 +7,20 @@ import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by bw12954 on 02/06/16.
+ * Action object fired when either the left, right, escape keys or the
+ * space bar is pressed
  */
 public class Finished extends AbstractAction {
 
    private World world;
 
-   public Finished(World world)
+   public Finished(final World world)
    {
       this.world = world;
    }
 
    @Override
-   public void actionPerformed(ActionEvent e)
+   public void actionPerformed(final ActionEvent e)
    {
       final Player player = world.getPlayer();
       player.finishedMove();
